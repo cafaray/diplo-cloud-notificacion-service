@@ -146,7 +146,9 @@ For more details in the use of [tekton](https://tekton.dev) in the project, visi
 
 ## Triggers
 
-This repo contains a Webhook linking an event listener in Openshift to deploy the application.
+This repo contains a Webhook linking an event listener in Openshift to deploy the application. The execution of the pipeline happens in any push to the main branch, deploying a new version of the application. 
+
+![Webhook-Trigger](_resources/webhook-trigger.png)
 
 ## Test
 

@@ -196,6 +196,23 @@ secrets:
 - name: tekton-pipeline-dockercfg-5mqvv
 ```
 
+## Service account para la pipeline
 
+Para poder ejecutar las pipelines de tekton que interactuan con elementos externos y requieren de credenciales especificas para la ejecución, se recomienda crear un elemento `ServiceAccount` para configurar los permisos requeridos.
+ 
+`kubectl create sa tekton-pipeline `
 
-k exec -ti notificaciones-service-647f9d885-hfzqt -- curl localhost:8081
+### otorgar el rol privilegiado dentro de openshift
+oc adm policy add-role-to-user edit -z tekton-pipeline 
+
+### Permisos para developers
+
+Para los permisos de los _users_ (__rol developer__) habría que asignar el security context correspondiente
+
+> Referencia [Security Context](https://docs.openshift.com/container-platform/4.8/cicd/pipelines/using-pods-in-a-privileged-security-context.html)
+
+`oc adm policy add-scc-to-user privileged -z tekton-pipeline -n {user##}`  <-- deberás cambiar por tu `user##` correspondiente.
+
+## WebHooks:
+
+[Editing Webhooks in Git.](https://docs.github.com/en/webhooks/using-webhooks/editing-webhooks)
