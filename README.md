@@ -1,5 +1,7 @@
 # Getting Started
 
+Ready for second round
+
 ## Project
 
 Implementation of notification microservice for the Pixup application.

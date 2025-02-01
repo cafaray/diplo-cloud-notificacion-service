@@ -50,14 +50,14 @@ public class NotificacionServiceApplicationTests {
 
 	// .withBasicAuth(ADMIN_TEST_LOGIN, ADMIN_TEST_PASSWORD)
 
-
+/* This test is locked as the application is not running, it's just a simple example on how to test an integration
 	@Test
 	public void getNotificacionesTest() {
 		TestRestTemplate testRestTemplate = new TestRestTemplate();
 		ResponseEntity<NotificacionResponse[]> response = testRestTemplate.getForEntity(BASE_URL, NotificacionResponse[].class);
 		Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
-
+*/
 	@Test
 	public void getNotificacionByIdMockSuccessTest()  {
 		try {
