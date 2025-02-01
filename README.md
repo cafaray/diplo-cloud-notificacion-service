@@ -1,6 +1,8 @@
 # Getting Started
 
-Ready for test the pipeline in the second round diplo course
+Ready for test the pipeline in the second round diplo course.
+
+:( I'm sorry I forgot to put the final dot.
 
 ## Project
 
