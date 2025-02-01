@@ -1,6 +1,6 @@
 # Getting Started
 
-Ready for second round
+Ready for test the pipeline in the second round diplo course
 
 ## Project
 
