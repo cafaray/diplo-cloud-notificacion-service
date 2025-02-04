@@ -7,11 +7,6 @@ pipeline {
     DOCKERHUB_CREDENTIALS = credentials('docker_registry')
   }
   stages {
-    stage('Install') {
-      steps {
-        sh 'apt-get update'
-      }
-    }
     stage('Build') {
       steps {
         sh './jenkins/build.sh'
