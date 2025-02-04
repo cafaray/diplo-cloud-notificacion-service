@@ -1,7 +1,7 @@
 pipeline {
   agent any // { label 'docker' }
   tools {
-    dockerTool 'docker'
+    dockerTool 'docker_tool'
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
