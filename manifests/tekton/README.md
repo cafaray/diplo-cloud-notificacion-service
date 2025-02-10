@@ -62,9 +62,61 @@ tkn pipeline start pipeline-git-clone-build-push-deploy \
 
 # Notas adicionales.
 
-## Conexión con el hub de Docker
+## Uso de cuentas de servicio
 
-Crear el secreto para conectar con el Docker Hub usando el archivo config.json localizado
+La ejecución de recursos como Pipelines y Tasks en Tekton requieren contar con una autorización explicita para poder llevar a cabo las 
+acciones especificadas en cada recurso. Recordemos que como buena práctica de seguridad debemos de contemplar la asignación de los permisos
+mínimamente necesarios para la ejecución de tareas. Se recomienda estructurar la definición de Tasks y Pipelines comunes en un `namespace` 
+especifico, y luego las especificas de cada proyecto en su propio `namespace`; Así mismo se deberán estructurar las TaskRun y PipelineRun de 
+los proyectos. Lo mismo sucede con las cuentas de servicio `serviceAccount` y los permisos a facilitar. 
+
+Con fines prácticos para el aprendizaje de la ejecución de las tareas de integración y despliegue con Tekton, integraremos una `serviceAccount`
+genérica al proyecto y le daremos los permisos para que pueda integrar y desplegar los recursos de los ejercicios y laboratorios.
+
+- Define la cuenta de servicio y los permisos necesarios.
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tekton-sa
+```
+
+- Tekton requiere permisos para acceder a recursos como `pods`,  `pvc`, y objetos de `pipeline`. Para especificar esto debemos de crear 
+un `Role` y `RoleBinding`:
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tekton-role
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "persistentvolumeclaims", "secrets", "configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "delete"]
+  - apiGroups: ["tekton.dev"] # Controller needs to access these tekton resources to do the specific actions
+    resources: ["pipelineruns", "taskruns"]
+    verbs: ["get", "list", "watch", "create", "update", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tekton-rolebinding
+subjects:
+  - kind: ServiceAccount
+    name: tekton-sa
+    namespace: default
+roleRef:
+  kind: Role
+  name: tekton-role
+  apiGroup: rbac.authorization.k8s.io
+```
+
+### Conexión con el hub de Docker
+
+Hay dos formas de hacerlo:
+
+1. Si ya estas logado al Hub de Docker con tu máquina (local), crea el secreto para conectar con el Docker Hub usando el archivo `config.json` 
 
 > Dependiendo del sistema operativo que estes trabajando, puedes verificar la ruta en:
 > __Windows:__   c:\Users\`{usuario}`\.docker\config.json
@@ -73,11 +125,38 @@ Crear el secreto para conectar con el Docker Hub usando el archivo config.json l
 
 `kubectl create secret generic regcred --from-file=.dockerconfigjson=<path/to/.docker/config.json> --type=kubernetes.io/dockerconfigjson`
 
-## Service account para la pipeline
+2. Usando las credenciales del Hub de Docker
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: basic-user-pass
+  annotations:
+    tekton.dev/docker-0: https://gcr.io # Described below
+type: kubernetes.io/basic-auth
+stringData:
+  username: { cleartext username }
+  password: { cleartext password } # remember to use the docker token instead your real password
+```
+
+- Integrar el secreto en la `ServiceAccount`
+
+```yaml
+kind: ServiceAccount
+metadata:
+  name: tekton-sa
+imagePullSecrets:
+- name: basic-user-pass                     # <-- add new secret 
+secrets:
+  - name: basic-user-pass                   # <-- add new secret
+```
+
+## Definir la ServiceAccount en OpenShift
 
 Para poder ejecutar las pipelines de tekton que interactuan con elementos externos y requieren de credenciales especificas para la ejecución, se recomienda crear un elemento `ServiceAccount` para configurar los permisos requeridos.
 
-`kubectl create sa tekton-pipeline `
+`kubectl create sa tekton-sa`
 
 ### otorgar el rol privilegiado dentro de openshift
 oc adm policy add-role-to-user edit -z tekton-pipeline
@@ -88,7 +167,8 @@ Para los permisos de los _users_ (__rol developer__) habría que asignar el secu
 
 > Referencia [Security Context](https://docs.openshift.com/container-platform/4.8/cicd/pipelines/using-pods-in-a-privileged-security-context.html)
 
-`oc adm policy add-scc-to-user privileged -z tekton-pipeline -n {user##}`  <-- deberás cambiar por tu `user##` correspondiente.
+`oc adm policy add-scc-to-user privileged -z tekton-sa -n {user##}`  <-- deberás cambiar por tu `user##` correspondiente.
+
 ## Pipeline
 
 Una Pipeline define una serie ordenada de tareas organizadas en un orden de ejecución específico como parte del flujo de trabajo de CI/CD.
@@ -159,17 +239,17 @@ El resultado muestra que ambas tareas se completaron correctamente:
 ```
 
 
-# Create a simple dedicated service account for the pipeline
+# Create a dedicated ServiceAccount for openShift pipelines
 
-`kubectl create sa tekton-pipeline -n tekton-demo` 
+`kubectl create sa tekton-sa -n tekton-demo` 
 
-# Run this for permissions on OpenShift
+## Run this for permissions on OpenShift
 ```bash
-oc adm policy add-role-to-user edit -z tekton-pipeline -n tekton-demo
-oc adm policy add-scc-to-user privileged -z tekton-pipeline -n tekton-demo
+oc adm policy add-role-to-user edit -z tekton-sa -n tekton-demo
+oc adm policy add-scc-to-user privileged -z tekton-sa -n tekton-demo
 ```
 
-# Create the secret for docker.io hub 
+## Create the secret for docker.io hub 
 
 ```bash
 kubectl create secret generic dockerhub \
@@ -179,7 +259,7 @@ kubectl create secret generic dockerhub \
 
 Get the dedicated service account associated for the pipeline
 
-`k get sa tekton-pipeline -o yaml > service-account.yaml`
+`k get sa tekton-sa -o yaml > service-account.yaml`
 
 Edit the recent created file and include the secretfor docker.io hub
 
@@ -195,7 +275,3 @@ secrets:
 - name: dockerhub                   # <-- add new secret
 - name: tekton-pipeline-dockercfg-5mqvv
 ```
-
-
-
-k exec -ti notificaciones-service-647f9d885-hfzqt -- curl localhost:8081

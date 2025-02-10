@@ -1,16 +1,23 @@
-# Use an official OpenJDK runtime as a parent image
-# FROM arm64v8/openjdk:17-ea-16-jdk
-# FROM khipu/openjdk17-alpine:latest
-FROM docker.io/khipu/openjdk17-alpine:latest
+# Base image with Docker and Maven
+FROM docker:24.0.7 AS builder
 
-# Set the working directory inside the container
+# Install Maven and JDK
+RUN apk add --no-cache openjdk17 maven
+
+# Set working directory
 WORKDIR /app
 
-# Copy the JAR file from the target directory into the container
-COPY target/notificacion-service-0.0.1-SNAPSHOT.jar /app/app.jar
+# Copy project files
+COPY pom.xml .
+RUN mvn dependency:go-offline
 
-# Expose the port that your Spring Boot application will listen on
-EXPOSE 8081
+COPY src ./src
 
-# Define the command to run your application
-CMD ["java", "-jar", "app.jar"]
+# Build the Java application
+RUN mvn package -DskipTests
+
+# Log in to Docker Hub and build/push the image
+CMD docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" && \
+    docker build -t "$DOCKER_IMAGE" . && \
+    docker push "$DOCKER_IMAGE"
+

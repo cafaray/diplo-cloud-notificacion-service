@@ -2,16 +2,14 @@ apiVersion: tekton.dev/v1beta1
 kind: TaskRun
 metadata:
   generateName: buildah-run-
-  namespace: user15
 spec:
+  serviceAccountName: tekton-sa
   taskRef:
     name: buildah
   params:
     - name: IMAGE
-      # value: 'image-registry.openshift-image-registry.svc:5000/tekton-demo/notificaciones:snapshot'
-      # value: 'docker.io/cafaray/notificaciones:V6'      
-      value: 'image-registry.openshift-image-registry.svc:5000/user15/mascota-rest-app:1.0'
-      # value: 'docker.io/luisriveracdmx/mascota-rest-app:1.0'   
+      # value: 'image-registry.openshift-image-registry.svc:5000/tekton-demo/notificaciones:V6'
+      value: 'docker.io/cafaray/notificaciones:V6'
     - name: TLSVERIFY
       value: 'false'
     - name: STORAGE_DRIVER
@@ -19,5 +17,4 @@ spec:
   workspaces:
     - name: source
       persistentVolumeClaim:
-        claimName: shared-workspace
-  serviceAccountName: tekton-pipeline
+        claimName: workspace

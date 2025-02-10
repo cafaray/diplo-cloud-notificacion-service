@@ -13,4 +13,4 @@ spec:
   workspaces:
     - name: directory
       persistentVolumeClaim:
-        claimName: shared-workspace
+        claimName: workspace

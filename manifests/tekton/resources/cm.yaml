@@ -281,8 +281,5 @@ data:
     </settings>
 kind: ConfigMap
 metadata:
-  creationTimestamp: "2023-11-18T13:36:35Z"
   name: maven-settings
-  namespace: tekton-demo
-  resourceVersion: "74538630"
-  uid: 4f8d0e6f-39ba-47ce-a2cf-f6329271b37d
+  namespace: default

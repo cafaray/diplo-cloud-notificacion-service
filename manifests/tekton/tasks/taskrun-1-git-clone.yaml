@@ -6,13 +6,27 @@ spec:
   taskRef:
     kind: Task
     name: git-clone
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
   params:
   - name: url
-    value: https://github.com/urielhdez/diplo-cloud-notificacion-service
+    value: https://github.com/cafaray/diplo-cloud-notificacion-service.git
   - name: deleteExisting
     value: "true"
   workspaces:
     - name: output
-      #emptyDir: {}
+      # emptyDir when we don't need to share data accross tasks.
+      # It holds a temporary directory that only lives as long as the TaskRun.
+      # https://tekton.dev/docs/pipelines/workspaces/#emptydir
+      # emptyDir: {}
       persistentVolumeClaim:
-        claimName: shared-workspace
+        claimName: workspace
+
+      # volumeClaimTemplate:
+      #  spec:
+      #    accessModes:
+      #      - ReadWriteOnce
+      #    resources:
+      #      requests:
+      #        storage: 1Gi

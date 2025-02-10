@@ -1,16 +1,15 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  # generateName: pipelinerun-cicd-deploy-
-  name: pipelinerun-cicd-deploy
+  generateName: pipelinerun-cicd-deploy-
+  # name: pipelinerun-cicd-deploy
 spec:
-  serviceAccountName: tekton-pipeline
-
+  serviceAccountName: tekton-sa
   pipelineRef:
-    name: ci-tekton
+    name: ci-clone-build
   params:
   - name: repo-url
-    value: https://github.com/urielhdez/diplo-cloud-notificacion-service
+    value: https://github.com/cafaray/diplo-cloud-notificacion-service.git
   - name: tag-name
     value: main
   - name: image-full-path-with-tag
@@ -25,8 +24,8 @@ spec:
     configmap:
       name: maven-settings
   - name: workspace
-    persistentvolumeclaim:
-      claimName: shared-workspace
+    persistentVolumeClaim:
+      claimName: workspace
   - name: empty-dir
     emptyDir: {}
       

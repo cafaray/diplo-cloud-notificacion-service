@@ -5,7 +5,10 @@ metadata:
 spec:
   taskRef:
     name: list-directory
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
   workspaces:
-    - name: directory
+    - name: output
       persistentVolumeClaim:
-        claimName: shared-workspace
+        claimName: workspace

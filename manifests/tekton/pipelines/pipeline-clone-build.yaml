@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: ci-tekton
+  name: ci-clone-build
 spec:
   description: |
     this pipeline offers a typical CI/CD process, with a flow including:
@@ -11,9 +11,9 @@ spec:
   - name: repo-url
     type: string
     description: The git repository URL to clone from.
-  - name: tag-name
-    type: string
-    description: The git tag to clone.    
+  # - name: tag-name
+  #   type: string
+  #   description: The git tag to clone.
   # - name: image-full-path-with-tag
   #   type: string
   #   description: | 
@@ -22,12 +22,10 @@ spec:
     type: string
     description: Image for compile pom
     default: 'gcr.io/cloud-builders/mvn@sha256:8f38a2667125a8d83f6e1997847fedb6a06f041c90e2244884153d85d95f869b'
-  
   workspaces:
     - name: workspace
     - name: maven-settings
-    - name: empty-dir      
-
+    - name: empty-dir
   tasks:
     - name: git-clone
       taskRef:
@@ -62,7 +60,7 @@ spec:
         value: $(params.maven-image)      
       taskRef:
         kind: Task
-        name: maven    
+        name: maven
       workspaces:
       - name: maven-settings
         workspace: maven-settings

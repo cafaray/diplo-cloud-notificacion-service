@@ -3,6 +3,7 @@ kind: TaskRun
 metadata:
   generateName: kubernetes-actions-
 spec:
+  serviceAccountName: tekton-sa
   taskRef:
     name: kubernetes-actions
   params:
@@ -17,6 +18,3 @@ spec:
       emptyDir: {}
     - name: manifest-dir
       emptyDir: {}
-  serviceAccountName: tekton-pipeline
-
-

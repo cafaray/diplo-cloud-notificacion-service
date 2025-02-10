@@ -3,6 +3,9 @@ kind: TaskRun
 metadata:
   generateName: maven-
 spec:
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
   taskRef:
     kind: Task
     name: maven
@@ -19,6 +22,6 @@ spec:
     - name: maven-settings
       configmap:
         name: maven-settings
-    - name: source
+    - name: output
       persistentVolumeClaim:
-        claimName: shared-workspace
+        claimName: workspace
