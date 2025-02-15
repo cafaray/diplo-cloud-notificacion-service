@@ -4,6 +4,8 @@ El CLI de Tekton ofrece ventajas sobre la operación y gestión de `Task` y `Pip
 
 Las versiones recientes de Openshift cuentan con en su Hub con el instalador de los operadores de Tekton para su uso, en caso de que estes trabajando fuera de Openshift, el sitio oficial ofrece los medios de instalación sobre kubernetes, puedes encontrarlo en el [apartado de instalación](https://tekton.dev/docs/installation/)
 
+# Tekton tasks
+
 ## Clonar repositorio git
 
 tkn task start git-clone \
@@ -39,7 +41,7 @@ tkn task start buildah \
 --serviceaccount=tekton-pipeline \
 --showlog
 
-## Despliegue en el cluster
+## Manejo de Kubernetes
 
 tkn task start kubernetes-actions \
 --param=script="kubectl apply -f https://raw.githubusercontent.com/brightzheng100/tekton-pipeline-example/master/manifests/deployment.yaml; kubectl get deployment;" \
@@ -47,6 +49,8 @@ tkn task start kubernetes-actions \
 --workspace=name=manifest-dir,emptyDir= \
 --serviceaccount=tekton-pipeline \
 --showlog
+
+# Tekton pipelines
 
 ## Pipeline con todas las tareas
 
@@ -105,14 +109,14 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: tekton-sa
-    namespace: default
+    namespace: {{ namespace }}
 roleRef:
   kind: Role
   name: tekton-role
   apiGroup: rbac.authorization.k8s.io
 ```
 
-### Conexión con el hub de Docker
+## Configura la conexión con el hub de Docker
 
 Hay dos formas de hacerlo:
 
@@ -152,13 +156,13 @@ secrets:
   - name: basic-user-pass                   # <-- add new secret
 ```
 
-## Definir la ServiceAccount en OpenShift
+## Establecer la ServiceAccount en OpenShift
 
 Para poder ejecutar las pipelines de tekton que interactuan con elementos externos y requieren de credenciales especificas para la ejecución, se recomienda crear un elemento `ServiceAccount` para configurar los permisos requeridos.
 
 `kubectl create sa tekton-sa`
 
-### otorgar el rol privilegiado dentro de openshift
+### Otorgar un rol privilegiado dentro de openshift
 oc adm policy add-role-to-user edit -z tekton-pipeline
 
 ### Permisos para developers
@@ -169,77 +173,7 @@ Para los permisos de los _users_ (__rol developer__) habría que asignar el secu
 
 `oc adm policy add-scc-to-user privileged -z tekton-sa -n {user##}`  <-- deberás cambiar por tu `user##` correspondiente.
 
-## Pipeline
-
-Una Pipeline define una serie ordenada de tareas organizadas en un orden de ejecución específico como parte del flujo de trabajo de CI/CD.
-
-Crearemos nuestra primer Pipeline, que incluirá tanto el mensaje "¡Hola {nombre}!" ¡y adiós! {nombre}”.
-
-Cree un nuevo archivo llamado hello-goodbye-pipeline.yaml y agregue el siguiente contenido:
-
-```yaml
-apiVersion: tekton.dev/v1beta1
-kind: Pipeline
-metadata:
-  name: hello-goodbye
-spec:
-  params:
-  - name: name
-    type: string
-  tasks:
-    - name: hello
-      taskRef:
-        name: hello
-      params:
-      - name: name
-        value: $(params.name)
-    - name: goodbye
-      runAfter:
-        - hello
-      taskRef:
-        name: goodbye
-      params:
-      - name: name
-        value: $(params.name)
-```
-
-Pipeline define el parámetro nombre de usuario, que luego se pasa a la tarea de despedida.
-
-Aplica la configuración de Pipeline:
-
-`kubectl apply --filename hello-goodbye-pipeline.yaml``
-
-Un PipelineRun, representado en la API como un objeto del tipo PipelineRun, establece el valor de los parámetros y ejecuta un Pipeline. 
-
-Para crear PipelineRun, cree un nuevo archivo llamado hello-goodbye-pipeline-run.yaml con lo siguiente:
-
-```yaml
-apiVersion: tekton.dev/v1beta1
-kind: PipelineRun
-metadata:
-  name: hello-goodbye-run
-spec:
-  pipelineRef:
-    name: hello-goodbye
-  params:
-  - name: name
-    value: "World"
-```
-
-Inicie Pipeline aplicando la configuración de PipelineRun:
-
-`kubectl apply --filename hello-goodbye-pipeline-run.yaml`
-
-El resultado muestra que ambas tareas se completaron correctamente:
-
-```bash
-[hello : echo] Hello World!
-
-[goodbye : goodbye] Goodbye World!
-```
-
-
-# Create a dedicated ServiceAccount for openShift pipelines
+# Dedicated ServiceAccount for openShift pipelines
 
 `kubectl create sa tekton-sa -n tekton-demo` 
 

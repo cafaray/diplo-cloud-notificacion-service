@@ -22,11 +22,3 @@ spec:
       # emptyDir: {}
       persistentVolumeClaim:
         claimName: workspace
-
-      # volumeClaimTemplate:
-      #  spec:
-      #    accessModes:
-      #      - ReadWriteOnce
-      #    resources:
-      #      requests:
-      #        storage: 1Gi
