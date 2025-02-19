@@ -20,7 +20,7 @@ The following scripts are provided for the MongoDB database/collections creation
 
 This image is based on [arm64/jdk-17](https://hub.docker.com/layers/arm64v8/openjdk/17-ea-16-jdk/images/sha256-149f7dbd5287cb06efc8c5d0dfffeffcc36e8a9872dca7736ef8c333a3eca6a2?context=explore) for Mac OS. 
 
-The complete specification of the image that contains the application is in the [Dockerfile](./Dockerfile)
+The complete specification of the image that contains the application is in the [Dockerfile](./DockerfileDoJob)
 
 ### Building the image.
 
@@ -146,7 +146,7 @@ tkn pipeline start pipeline-git-clone-build-push-deploy \
 --showlog
 ```
 
-For more details in the use of [tekton](https://tekton.dev) in the project, visit [manifest section](./manifests/tekton.md).
+For more details in the use of [tekton](https://tekton.dev) in the project, visit [manifest section](./manifests/tekton/README.md).
 
 ## Test
 
