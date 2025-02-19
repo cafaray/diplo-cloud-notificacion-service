@@ -1,0 +1,22 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  generateName: update-deployment-image-
+spec:
+  serviceAccountName: tekton-sa
+  taskRef:
+    name: kubernetes-actions
+  params:
+    - name: script
+      value: |
+        kubectl patch deployment $1 --patch='{"spec":{"template":{"spec":{
+          "containers":[{
+            "name": "'$1'",
+            "image": "'$2'"
+          }]
+        }}}}'
+    - name: args
+      value:
+        - notificaciones-service
+        - docker.io/cafaray/notificaciones:V2.2

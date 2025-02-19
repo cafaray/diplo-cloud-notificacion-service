@@ -1,0 +1,102 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline-ci
+spec:
+  description: |
+      Describe your pipeline
+  params:
+    - name: repo-url
+      type: string
+      description: The git repository URL to clone from.
+    - name: branch-name
+      type: string
+      description: The git repository URL to clone from.
+    - name: maven-image
+      default: gcr.io/cloud-builders/mvn@sha256:8f38a2667125a8d83f6e1997847fedb6a06f041c90e2244884153d85d95f869b
+      type: string
+      description: Image for compile pom
+    - name: image-name
+      type: string
+      description: The image full path to host the built image, with version tag, e.g. image-registry.openshift-image-registry.svc:5000/tekton-pipelines/spring-boot-docker:v1.0.0.
+  # Workspaces
+  workspaces:
+    - name: workspace
+    - name: maven-settings
+    - name: dockerconfig-ws
+    # - name: empty-dir
+  # Taksks
+  tasks:
+    # 1. Task - fetch-repository
+    - name: fetch-repository
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.branch-name)
+        - name: deleteExisting
+          value: "true"
+      workspaces:
+        - name: output
+          workspace: workspace
+
+    # 2. Task - maven build
+    - name: maven
+      taskRef:
+        name: maven
+      runAfter:
+        - fetch-repository
+      params:
+        - name: GOALS
+          value:
+            - -B
+            - -DskipTests
+            - clean
+            - package
+        - name: MAVEN_IMAGE
+          value: $(params.maven-image)
+      workspaces:
+        - name: maven-settings
+          workspace: maven-settings
+        - name: source
+          workspace: workspace
+
+    # 3. Task - buildah build & push
+    - name: buildah
+      taskRef:
+        name: buildah
+      runAfter:
+        - maven
+      params:
+        - name: IMAGE
+          value: "$(params.image-name)"
+        - name: TLSVERIFY
+          value: "false"
+        - name: STORAGE_DRIVER
+          value: "vfs"
+      workspaces:
+        - name: source
+          workspace: workspace
+        - name: dockerconfig
+          workspace: dockerconfig-ws
+
+    # 4. Task - kubectl deploy
+    # - name: deploy
+    #   taskRef:
+      #     name: kubernetes-actions
+        # runAfter:
+        #  - buildah
+        # params:
+          # - name: script
+            # value: |
+            # kubectl delete deployment notificacion-service
+            # kubectl create deployment notificacion-service --image=$(params.image-full-path-with-tag)
+            # echo "----------"
+          # kubectl get deployment
+        # workspaces:
+          # - name: kubeconfig-dir
+          # workspace: empty-dir
+          # - name: manifest-dir
+          # workspace: empty-dir

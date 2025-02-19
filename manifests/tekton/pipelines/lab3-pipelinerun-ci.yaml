@@ -1,0 +1,32 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: pipelinerun-ci-
+spec:
+  serviceAccountName: tekton-sa
+  pipelineRef:
+    name: pipeline-ci
+  params:
+    - name: repo-url
+      value: https://github.com/cafaray/diplo-cloud-notificacion-service.git
+    - name: branch-name
+      value: main
+    - name: image-name
+      # value: image-registry.openshift-image-registry.svc:5000/tekton-demo/spring-boot-docker:v1.1.0
+      value: docker.io/cafaray/notificaciones:v2.4
+    # - name: deployment-manifest
+    #  value: https://raw.githubusercontent.com/brightzheng100/tekton-pipeline-example/master/manifests/deployment.yaml
+    - name: maven-image
+      value: gcr.io/cloud-builders/mvn@sha256:8f38a2667125a8d83f6e1997847fedb6a06f041c90e2244884153d85d95f869b
+  workspaces:
+    - name: maven-settings
+      configmap:
+        name: maven-settings
+    - name: workspace
+      persistentVolumeClaim:
+        claimName: workspace
+    - name: dockerconfig-ws
+      secret:
+        secretName: dockerconfig-ws
+    # - name: empty-dir
+    #   emptyDir: {}

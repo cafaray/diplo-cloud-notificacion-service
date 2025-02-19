@@ -9,6 +9,6 @@ spec:
     securityContext:
       fsGroup: 65532
   workspaces:
-    - name: output
+    - name: directory
       persistentVolumeClaim:
         claimName: workspace

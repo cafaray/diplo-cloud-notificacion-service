@@ -22,6 +22,6 @@ spec:
     - name: maven-settings
       configmap:
         name: maven-settings
-    - name: output
+    - name: source # output
       persistentVolumeClaim:
         claimName: workspace
