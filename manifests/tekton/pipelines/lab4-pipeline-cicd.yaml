@@ -1,11 +1,10 @@
----
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pipeline-ci
+  name: pipeline-cicd
 spec:
   description: |
-      Describe your pipeline
+    Describe your pipeline
   params:
     - name: repo-url
       type: string
@@ -20,11 +19,15 @@ spec:
     - name: image-name
       type: string
       description: The image full path to host the built image, with version tag, e.g. image-registry.openshift-image-registry.svc:5000/tekton-pipelines/spring-boot-docker:v1.0.0.
+    - name: deployment-name
+      type: string
+      description: Represent the Deployment which will be created at Kubernetes
   # Workspaces
   workspaces:
     - name: workspace
     - name: maven-settings
     - name: dockerconfig-ws
+    - name: empty-dir
   # Taksks
   tasks:
     # 1. Task - fetch-repository
@@ -81,3 +84,23 @@ spec:
           workspace: workspace
         - name: dockerconfig
           workspace: dockerconfig-ws
+
+    # 4. Task - kubectl deploy
+    - name: deploy
+      taskRef:
+        name: kubernetes-actions
+      runAfter:
+        - buildah
+      params:
+      - name: script
+        value: |
+          echo " deployment-name: $(params.deployment-name) "
+          # kubectl delete deployment $(params.deployment-name)
+          # kubectl create deployment $(params.deployment-name) --image=$(params.image-name)
+          # echo " End deployment"
+          curl -sSL https://raw.githubusercontent.com/cafaray/diplo-cloud-notificacion-service/refs/heads/main/manifests/tekton/resources/scripts/deployment.sh | bash
+      workspaces:
+      - name: kubeconfig-dir
+        workspace: empty-dir
+      - name: manifest-dir
+        workspace: empty-dir
