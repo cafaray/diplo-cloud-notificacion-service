@@ -13,7 +13,7 @@ spec:
       value: main
     - name: image-name
       # value: image-registry.openshift-image-registry.svc:5000/tekton-demo/spring-boot-docker:v1.1.0
-      value: docker.io/cafaray/notificaciones:v2.4
+      value: docker.io/cafaray/notificaciones:v2.5
     # - name: deployment-manifest
     #  value: https://raw.githubusercontent.com/brightzheng100/tekton-pipeline-example/master/manifests/deployment.yaml
     - name: maven-image
