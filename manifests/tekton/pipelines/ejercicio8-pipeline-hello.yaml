@@ -1,0 +1,46 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline-hello-world
+spec:
+  description: |
+    This pipeline is used to demonstrate in an easy way how a Tekton Pipeline works:
+    Tasks defined in the pipeline:
+    - echo: Warm wellcome writing your name
+    - git-clone: fetching a git repository as the source
+    - echo: using taskSpec if task does not exist and is not a complex step
+  params:
+    - name: your-name
+      type: string
+    - name: repo-url
+      type: string
+  workspaces:
+    - name: empty-dir
+  tasks:
+    - name: hello
+      taskRef:
+        name: task-echo
+      params:
+        - name: message
+          value: “hello $(params.your-name)”
+    - name: git-clone
+      taskRef:
+        kind: Task
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.repo-url)
+      workspaces:
+        - name: output
+          workspace: empty-dir
+    - name: goodbye
+      runAfter:
+        - git-clone
+      taskSpec:
+      # There are no explicit params defined here.
+      # They are derived from the TaskRun params above.
+        steps:
+          - name: default
+            image: busybox
+            script: |
+              echo “my first pipeline is done and executed!”

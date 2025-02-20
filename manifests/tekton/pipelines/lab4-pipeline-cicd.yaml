@@ -92,13 +92,19 @@ spec:
       runAfter:
         - buildah
       params:
-      - name: script
-        value: |
-          echo " deployment-name: $(params.deployment-name) "
-          # kubectl delete deployment $(params.deployment-name)
-          # kubectl create deployment $(params.deployment-name) --image=$(params.image-name)
-          # echo " End deployment"
-          curl -sSL https://raw.githubusercontent.com/cafaray/diplo-cloud-notificacion-service/refs/heads/main/manifests/tekton/resources/scripts/deployment.sh | bash
+        # - name: image
+        #  value: gcr.io/cloud-builders/kubectl@sha256:cc2e44c3355dad01d5fb017e1d1b22f1e929016360df6b311687174eb2536bed
+        - name: script
+          value: |
+            # curl -sSL https://raw.githubusercontent.com/cafaray/diplo-cloud-notificacion-service/refs/heads/main/manifests/tekton/resources/scripts/deployment.sh | bash
+            echo " deployment-name: $(params.deployment-name) "
+            kubectl delete deployment $(params.deployment-name)
+            kubectl create deployment $(params.deployment-name) --image=$(params.image-name)
+            kubectl scale deployment $(params.deployment-name) --replicas=$1
+            echo " End deployment"
+        - name: args
+          value:
+            - 3
       workspaces:
       - name: kubeconfig-dir
         workspace: empty-dir
