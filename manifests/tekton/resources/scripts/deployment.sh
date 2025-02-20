@@ -14,7 +14,7 @@ echo "verifying deployment \n"
 CURRENT_ALREADY_PODS=$(kubectl get deployments $DEPLOYMENT_NAME | awk 'NR==2{print $4}')
 MINIMAL_AVAILABLE_PODS=3
 echo "Scaling services to $MINIMAL_AVAILABLE_PODS"
-kubectl scale deployment $(params.deployment-name) --replicas=$MINIMAL_AVAILABLE_PODS
+kubectl scale deployment $DEPLOYMENT_NAME --replicas=$MINIMAL_AVAILABLE_PODS
 COUNTER=1
 while [ $((CURRENT_ALREADY_PODS)) -lt $((MINIMAL_AVAILABLE_PODS)) ]
   do
