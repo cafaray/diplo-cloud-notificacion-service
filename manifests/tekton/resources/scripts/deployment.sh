@@ -9,7 +9,7 @@ IMAGE="docker.io/cafaray/notificaciones:V8"
 echo "Working with values: DEPLOYMENT_NAME = $DEPLOYMENT_NAME & IMAGE = $IMAGE \n"
 echo "starting deployment \n"
 kubectl delete deployment $DEPLOYMENT_NAME
-kubectl create deployment $DEPLOYMENT_NAME --replicas=2 --image=$IMAGE
+kubectl create deployment $DEPLOYMENT_NAME --image=$IMAGE
 echo "verifying deployment \n"
 CURRENT_ALREADY_PODS=$(kubectl get deployments $DEPLOYMENT_NAME | awk 'NR==2{print $4}')
 MINIMAL_AVAILABLE_PODS=2
