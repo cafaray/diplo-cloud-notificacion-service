@@ -1,6 +1,6 @@
 # Getting Started
 
-Ready to integrate pipeline topics into the second round for the Diplomado emission 2 - Module V.
+Ready to integrate the Tekton Pipelines topic into the second round for the Diplomado emission 2 - Module V.
 
 ## Project
 
