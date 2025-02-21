@@ -1,6 +1,6 @@
 # Getting Started
 
-Ready to integrate pipeline topics into the second round for the Diplomado emission two module V.
+Ready to integrate pipeline topics into the second round for the Diplomado emission two - Module V.
 
 ## Project
 
