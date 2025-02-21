@@ -1,7 +1,8 @@
 # Getting Started
 
 Ready to integrate the Tekton Pipelines topic into the second round for the Diplomado emission 2 - Module V.
-Doing a test over `test` namespace
+
+Doing a trigger test over `test` namespace.
 
 ## Project
 
