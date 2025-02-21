@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: pipelinerun-helloworld-
+spec:
+  serviceAccountName: tekton-sa
+  pipelineRef:
+    name: pipeline-hello-world
+  params:
+    - name: your-name
+      value: "{{ tu-nombre }}"
+    - name: repo-url
+      value: https://github.com/cafaray/diplo-cloud-notificacion-service.git
+  workspaces:
+    - name: empty-dir
+      emptyDir: {}

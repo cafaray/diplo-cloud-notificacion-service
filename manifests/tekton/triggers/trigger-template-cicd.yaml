@@ -1,0 +1,49 @@
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: tekton-trigger-template-cicd
+spec:
+  params:
+    - name: repo-url
+      description: The git repository URL to clone from.
+    - name: branch-name
+      description: The git tag to clone.
+    - name: maven-image
+      description: The maven image to use for compile and build
+    - name: image-name
+      description: The image full path to host the built image, with version tag, e.g. image-registry.openshift-image-registry.svc:5000/tekton-pipelines/spring-boot-docker:v1.0.0.
+    - name: deployment-name
+      description: The script file for deployment.
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: pipelinerun-cicd-
+      spec:
+        serviceAccountName: tekton-sa
+        pipelineRef:
+          name: pipeline-cicd
+        params:
+          - name: repo-url
+            value: $(tt.params.repo-url)
+          - name: branch-name
+            value: $(tt.params.branch-name)
+          - name: maven-image
+            value: $(tt.params.maven-image)
+          - name: image-name
+            value: $(tt.params.image-name)
+          - name: deployment-name
+            value: $(tt.params.deployment-name)
+        workspaces:
+          - name: maven-settings
+            configmap:
+              name: maven-settings
+          - name: workspace
+            persistentVolumeClaim:
+              claimName: workspace
+          - name: empty-dir
+            emptyDir: {}
+          - name: dockerconfig-ws
+            secret:
+              secretName: dockerconfig-ws

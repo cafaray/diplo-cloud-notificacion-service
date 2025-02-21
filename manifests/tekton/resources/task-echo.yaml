@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-echo
+spec:
+  params:
+    - name: message
+      type: string
+      default: "Hello World!"
+  steps:
+    - name: echo
+      image: busybox
+      script: |
+        #!/bin/sh 
+        echo $(params.message)
+---
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  generateName: taskrun-echo-
+spec:
+  taskRef:
+    name: task-echo
+  params:
+    - name: message
+      value: "hello world"

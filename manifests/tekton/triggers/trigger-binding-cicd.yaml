@@ -1,0 +1,16 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: tekton-trigger-binding-cicd
+spec:
+  params:
+    - name: repo-url
+      value: $(body.repository.clone_url)
+    - name: branch-name
+      value: main #$(body.repository.default_branch)
+    - name: maven-image
+      value: gcr.io/cloud-builders/mvn@sha256:8f38a2667125a8d83f6e1997847fedb6a06f041c90e2244884153d85d95f869b
+    - name: image-name
+      value: docker.io/cafaray/notificaciones:$(body.head_commit.id)
+    - name: deployment-name
+      value: notificaciones-test
