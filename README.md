@@ -1,6 +1,6 @@
 # Getting Started
 
-Ready to test the pipeline in the second round for the diplomado-e2 course.
+Ready to test the pipeline in the second round for the diplomado-e2 module V.
 
 ## Project
 
