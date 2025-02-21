@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -20,14 +21,13 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: triggers-eventlistener-clusterbinding
-  namespace: test
 subjects:
   - kind: ServiceAccount
     name: tekton-triggers-sa
-    namespace: test
+    namespace: default
   - kind: ServiceAccount
     name: tekton-triggers-sa
-    namespace: default
+    namespace: test
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

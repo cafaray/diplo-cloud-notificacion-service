@@ -100,11 +100,11 @@ spec:
             echo " deployment-name: $(params.deployment-name) "
             kubectl delete deployment $(params.deployment-name)
             kubectl create deployment $(params.deployment-name) --image=$(params.image-name)
-            kubectl scale deployment $(params.deployment-name) --replicas=$1
+            kubectl scale deployment $(params.deployment-name) --replicas=3
             echo " End deployment"
-        - name: args
-          value:
-            - 3
+        # - name: args
+        #  value:
+        #    - 3
       workspaces:
       - name: kubeconfig-dir
         workspace: empty-dir
