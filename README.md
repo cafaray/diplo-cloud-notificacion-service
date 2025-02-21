@@ -1,6 +1,6 @@
 # Getting Started
 
-Ready to integrate the pipeline topics in the second round for the diplomado-e2 module V.
+Ready to integrate pipeline topics into the second round for the diplomado-e2 module V.
 
 ## Project
 
